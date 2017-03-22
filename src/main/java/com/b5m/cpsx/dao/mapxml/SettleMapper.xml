@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="settleMapper">
+	
+	<!-- 余额表 -->
+	<select id="selectRemainSum" resultType="java.util.HashMap">
+		SELECT user_id,apply_money,remain
+		FROM cpsx_settle_dim_commission_apply
+		WHERE user_id = #{user_id}
+		AND DATE_FORMAT(CONCAT(the_year,'-',the_month,'-1'), '%Y-%m')=DATE_FORMAT(now(), '%Y-%m')
+	</select>
+	
+	<select id="selectApplyingMoney" resultType="java.math.BigDecimal">
+		SELECT sum(apply_money)
+		FROM cpsx_settle_dim_commission_apply
+		WHERE user_id = #{user_id}
+		AND pay_state=0
+	</select>
+	
+<!-- 	<update id="updateRemainSum" parameterType="java.util.HashMap">
+		UPDATE cpsx_settle_website_remain_sum
+		SET 
+			applying_money = applying_money + #{cash},
+			remain_sum = remain_sum - #{cash}
+		WHERE user_id = #{user_id}
+	</update> -->
+	
+	<update id="updateRemainSum" parameterType="java.util.HashMap">
+		UPDATE cpsx_settle_dim_commission_apply
+		SET 
+			remain_sum = remain_sum + #{changed}
+		WHERE user_id = #{user_id}
+		AND DATE_FORMAT(create_time, '%Y-%m')=DATE_FORMAT(now(), '%Y-%m')
+	</update>
+	
+	<update id="updateApplyingMoney" parameterType="java.util.HashMap">
+		UPDATE cpsx_settle_dim_commission_apply
+		SET 
+			remain=remain-apply_money
+		WHERE user_id = #{user_id}
+		AND the_year=#{the_year}
+		AND the_month=#{the_month}
+		AND pay_state=1
+	</update>
+	
+	<!-- 佣金申请表 -->
+	<select id="selectCommissionApply" resultType="java.util.HashMap">
+		SELECT user_id,apply_money,the_year,the_month,commission,apply_date,check_state,pay_state,note,
+		DATE_FORMAT(CONCAT(the_year,'-',the_month,'-1'),'%Y-%m') the_date
+		FROM cpsx_settle_dim_commission_apply
+		WHERE user_id = #{user_id}
+		AND pay_state=0 or pay_state=2
+	</select>
+	
+	<select id="selectOneCommissionApply" resultType="java.util.HashMap">
+		SELECT user_id,apply_money,the_year,the_month,commission,apply_date,remain,
+		DATE_FORMAT(CONCAT(the_year,'-',the_month,'-1'),'%Y-%m') the_date,note
+		FROM cpsx_settle_dim_commission_apply
+		WHERE user_id = #{user_id}
+		AND the_year = #{the_year}
+		AND the_month = #{the_month}
+	</select>
+	
+	<select id="selectApplyDataByUserId" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT
+			DATE_FORMAT(CONCAT(the_year,'-',the_month,'-1'),'%Y-%m') the_date,commission,apply_money,remain,pay_state
+		FROM cpsx_settle_dim_commission_apply
+		WHERE user_id = #{user_id}
+		ORDER BY the_month
+	</select>
+	
+	<select id="selectCommissionApply_history" resultType="java.util.HashMap">
+		SELECT the_year,the_month,commission,apply_money,apply_date,
+			   DATE_FORMAT(CONCAT(the_year,'-',the_month,'-1'),'%Y-%m') the_date,
+		       tax_money,charge_money,pay_money,
+			   pay_date,receiver,pay_state,note
+		FROM cpsx_settle_dim_commission_apply
+		WHERE user_id = #{user_id}
+		AND pay_state = 1
+	</select>
+	
+	<select id="selectBICommissionApply" resultType="java.util.HashMap">
+		SELECT user_id,u.email,the_year,the_month,commission,apply_money,
+			   DATE_FORMAT(CONCAT(the_year,'-',the_month,'-1'),'%Y-%m') the_date,
+			   apply_date,tax_money,charge_money,pay_money,check_state,
+			   pay_date,receiver,pay_state,note
+		FROM cpsx_settle_dim_commission_apply a
+		LEFT JOIN cpsx_sys_dim_user u ON a.user_id=u.id
+		WHERE check_state!=-1
+	</select>
+	
+	<select id="selectFINCommissionApply" resultType="java.util.HashMap">
+		SELECT user_id,u.email,the_year,the_month,commission,apply_money,
+			   DATE_FORMAT(CONCAT(the_year,'-',the_month,'-1'),'%Y-%m') the_date,
+			   apply_date,tax_money,charge_money,pay_money,check_state,
+			   pay_date,receiver,pay_state,note
+		FROM cpsx_settle_dim_commission_apply a
+		LEFT JOIN cpsx_sys_dim_user u ON a.user_id=u.id
+		WHERE check_state=1
+	</select>
+	
+	<select id="hasApplied" parameterType="java.util.HashMap" resultType="Integer">
+		SELECT COUNT(*)
+		FROM cpsx_settle_dim_commission_apply
+		WHERE the_year=DATE_FORMAT(now(),'%Y')
+		AND the_month=DATE_FORMAT(now(),'%m')
+		AND user_id=#{user_id}
+	</select>
+	
+	<insert id="insertBatchApply" parameterType="java.util.List">
+		INSERT INTO cpsx_settle_dim_commission_apply (user_id,the_year,the_month,remain) VALUES 
+		<foreach collection="userList" item="item" index="index" separator=",">
+         (#{item.id},#{item.the_year},#{item.the_month},#{item.remain})
+        </foreach>
+	</insert>
+	
+	<update id="updateApplyCommission" parameterType="java.util.HashMap">
+	     UPDATE cpsx_settle_dim_commission_apply
+	     SET
+		      the_year=DATE_FORMAT(now(),'%Y'),
+		      the_month=DATE_FORMAT(now(),'%m'),
+		      apply_money=#{cash},
+		      apply_date=now(),
+		      check_state=0,
+		      pay_state=0,
+		      update_time=now()
+	      WHERE user_id=#{user_id}
+	</update>
+	
+	<update id="updateApplyCheckState" parameterType="java.util.HashMap">
+		UPDATE cpsx_settle_dim_commission_apply
+		SET 
+			check_state=#{check_state},
+			note = #{note}
+		WHERE user_id = #{user_id}
+		AND the_year = #{the_year}
+		AND the_month = #{the_month}
+	</update>
+	
+	<update id="reApplyCommission" parameterType="java.util.HashMap">
+		UPDATE cpsx_settle_dim_commission_apply
+		SET 
+			check_state=0,
+			pay_state=0,
+			note = ''
+		WHERE user_id = #{user_id} 
+		AND the_year = #{the_year}
+		AND the_month = #{the_month}
+	</update>
+	
+	<update id="completePayCommission" parameterType="java.util.HashMap">
+		UPDATE cpsx_settle_dim_commission_apply
+		SET
+			tax_money=#{tax_money},
+			charge_money=#{charge_money},
+			pay_money=#{pay_money},
+			pay_date=now(),
+			receiver=#{receiver},
+			note=#{note},
+			pay_state=#{pay_state}
+		WHERE user_id = #{user_id}
+		AND the_year = #{the_year}
+		AND the_month = #{the_month}
+	</update>
+
+</mapper>

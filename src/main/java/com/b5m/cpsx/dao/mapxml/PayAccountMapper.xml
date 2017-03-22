@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="payAccountMapper">
+
+	<select id="selectPayAccount" parameterType="Integer" resultType="java.util.HashMap">
+		SELECT
+			user_id,
+			bank_name,
+			bank_address,
+			bank_account,
+			register_name,
+			bank_tel_no,
+			alipay_account,
+			alipay_name,
+			alipay_tel_no,
+			identify_no
+		FROM cpsx_settle_dim_account_info
+		WHERE user_id = #{user_id}
+	</select>
+	
+	<select id="selectPayUserInfo" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT
+			t.*,
+			p.bank_name,
+			p.bank_address,
+			p.bank_account,
+			p.register_name,
+			p.bank_tel_no,
+			p.alipay_account,
+			p.alipay_name,
+			p.alipay_tel_no,
+			p.identify_no
+		FROM cpsx_settle_dim_commission_apply t
+		LEFT JOIN cpsx_settle_dim_account_info p ON t.user_id=p.user_id
+		WHERE t.user_id = #{user_id}
+		AND t.the_year=#{the_year}
+		AND t.the_month=#{the_month}
+	</select>
+	
+	<select id="selectExists" parameterType="Integer" resultType="Integer">
+		SELECT
+			count(*)
+		FROM cpsx_settle_dim_account_info
+		WHERE user_id = #{user_id}
+	</select>
+	
+	<select id="selectValidatePayPsw" parameterType="Integer" resultType="Integer">
+		SELECT
+			count(*)
+		FROM cpsx_settle_dim_account_info
+		WHERE user_id = #{user_id}
+		AND pay_psw=#{pay_psw}
+	</select>
+	
+	<insert id="insertPayAccount" parameterType="java.util.HashMap">
+		INSERT INTO cpsx_settle_dim_account_info
+		(
+			user_id,
+			bank_name,
+			bank_address,
+			bank_account,
+			register_name,
+			bank_tel_no,
+			alipay_account,
+			alipay_name,
+			alipay_tel_no,
+			identify_no
+		)
+		VALUES
+		(
+			#{user_id},
+			#{bank_name},
+			#{bank_address},
+			#{bank_account},
+			#{register_name},
+			#{bank_tel_no},
+			#{alipay_account},
+			#{alipay_name},
+			#{alipay_tel_no},
+			#{identify_no}
+		)
+	</insert>
+	
+	<update id="updateBankPayAccount" parameterType="java.util.HashMap">
+		UPDATE cpsx_settle_dim_account_info
+		SET 
+			bank_name=#{bank_name},
+			bank_address=#{bank_address},
+			bank_account=#{bank_account},
+			register_name=#{register_name},
+			identify_no=#{identify_no}
+		WHERE 
+		    user_id=#{user_id}
+			
+	</update>
+	
+	<update id="updateAliPayAccount" parameterType="java.util.HashMap">
+		UPDATE cpsx_settle_dim_account_info
+		SET 
+			alipay_account=#{alipay_account},
+			alipay_name=#{alipay_name},
+			alipay_tel_no=#{alipay_tel_no},
+			identify_no=#{identify_no}
+		WHERE 
+		    user_id=#{user_id}
+	</update>
+	
+	<update id="updatePayPassword" parameterType="java.util.HashMap">
+		UPDATE cpsx_settle_dim_account_info
+		SET 
+			pay_psw=#{pay_psw}
+		WHERE 
+		    user_id=#{user_id}
+	</update>
+	
+
+</mapper>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reportMapper">
+	
+	<select id="selectReportByDate" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+			SELECT
+				history_date,
+				sum(click_no) click_no,
+				sum(click_ip) click_ip,
+				sum(pre_order_count) pre_order_count,
+				sum(pre_order_money) pre_order_money,
+				sum(pre_commission) pre_commission,
+				sum(confirm_order_count) confirm_order_count,
+				sum(confirm_order_money) confirm_order_money,
+				sum(confirm_commission) confirm_commission
+			FROM
+				cpsx_report_fact_data_statistic s
+			LEFT JOIN cpsx_activity_dim_activity a ON s.action_id=a.id
+			LEFT JOIN cpsx_supply_dim_website w ON s.website_id = w.id
+			WHERE w.supply_id=#{userId}
+			<if test="q_start_date!=null and q_start_date!=''">
+				AND s.history_date<![CDATA[  >=  ]]>#{q_start_date}
+			</if>
+			<if test="q_end_date!=null and q_end_date!=''">
+				AND s.history_date<![CDATA[  <=  ]]>#{q_end_date}
+			</if>
+			<if test="q_action!=null and q_action!=''">
+				AND a.id=#{q_action} OR a.name like #{q_action}
+			</if>
+			<if test="q_website!=null and q_website!=''">
+				AND w.id=#{q_website} OR w.name like #{q_website}
+			</if>
+			GROUP BY(history_date)
+	</select>
+	
+	<select id="selectReportByAction" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+			SELECT
+			        a.id,
+			        a.name,
+					sum(click_no) click_no,
+					sum(click_ip) click_ip,
+					sum(pre_order_count) pre_order_count,
+					sum(pre_order_money) pre_order_money,
+					sum(pre_commission) pre_commission,
+					sum(confirm_order_count) confirm_order_count,
+					sum(confirm_order_money) confirm_order_money,
+					sum(confirm_commission) confirm_commission
+			FROM
+				cpsx_report_fact_data_statistic s
+			LEFT JOIN cpsx_activity_dim_activity a ON s.action_id=a.id
+			LEFT JOIN cpsx_supply_dim_website w ON s.website_id = w.id
+			WHERE
+				w.supply_id=#{userId}
+			<if test="q_start_date!=null and q_start_date!=''">
+				AND s.history_date<![CDATA[  >=  ]]>#{q_start_date}
+			</if>
+			<if test="q_end_date!=null and q_end_date!=''">
+				AND s.history_date<![CDATA[  <=  ]]>#{q_end_date}
+			</if>
+			<if test="q_action!=null and q_action!=''">
+				AND a.id=#{q_action} OR a.name like #{q_action}
+			</if>
+			<if test="q_website!=null and q_website!=''">
+				AND w.id=#{q_website} OR w.name like #{q_website}
+			</if>
+			GROUP BY a.id,a.name
+	</select>
+	
+	<select id="selectReportByWebsite" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+			SELECT
+			        w.id,
+			        w.name,
+					sum(click_no) click_no,
+					sum(click_ip) click_ip,
+					sum(pre_order_count) pre_order_count,
+					sum(pre_order_money) pre_order_money,
+					sum(pre_commission) pre_commission,
+					sum(confirm_order_count) confirm_order_count,
+					sum(confirm_order_money) confirm_order_money,
+					sum(confirm_commission) confirm_commission
+			FROM
+				cpsx_report_fact_data_statistic s
+			LEFT JOIN cpsx_activity_dim_activity a ON s.action_id=a.id
+			LEFT JOIN cpsx_supply_dim_website w ON s.website_id = w.id
+			WHERE
+				w.supply_id=#{userId}
+			<if test="q_start_date!=null and q_start_date!=''">
+				AND s.history_date<![CDATA[  >=  ]]>#{q_start_date}
+			</if>
+			<if test="q_end_date!=null and q_end_date!=''">
+				AND s.history_date<![CDATA[  <=  ]]>#{q_end_date}
+			</if>
+			<if test="q_action!=null and q_action!=''">
+				AND a.id=#{q_action} OR a.name like #{q_action}
+			</if>
+			<if test="q_website!=null and q_website!=''">
+				AND w.id=#{q_website} OR w.name like #{q_website}
+			</if>
+			GROUP BY w.id,w.name
+	</select>
+	
+	<!-- 明细查询 -->
+	<select id="selectReportDetail" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+			SELECT
+				order_no,
+				order_time,
+				order_status,
+				order_price,
+				action_id,
+				a.name activity,
+				website_id,
+				w.name website,
+				feed_back,
+				prod_type,
+				prod_id,
+				prod_name,
+				prod_count,
+				prod_price,
+				commission,
+				commission_rate,
+				confirm_time,
+				prod_link
+			FROM
+				cpsx_report_fact_pre_order d
+			LEFT JOIN cpsx_activity_dim_activity a ON d.action_id=a.id
+			LEFT JOIN cpsx_supply_dim_website w ON d.website_id = w.id
+			WHERE w.supply_id=#{userId}
+			<if test="q_start_order_date!=null and q_start_order_date!=''">
+				AND DATE_FORMAT(d.order_time,'%Y-%m-%d')<![CDATA[  >=  ]]>#{q_start_order_date}
+			</if>
+			<if test="q_end_order_date!=null and q_end_order_date!=''">
+				AND DATE_FORMAT(d.order_time,'%Y-%m-%d')<![CDATA[  <=  ]]>#{q_end_order_date}
+			</if>
+			<if test="q_start_confirm_time!=null and q_start_confirm_time!=''">
+				AND d.confirm_time<![CDATA[  >=  ]]>#{q_start_confirm_time}
+			</if>
+			<if test="q_end_confirm_time!=null and q_end_confirm_time!=''">
+				AND d.confirm_time<![CDATA[  <=  ]]>#{q_end_confirm_time}
+			</if>
+			<if test="q_order_no!=null and q_order_no!=''">
+				AND d.order_no=#{q_order_no}
+			</if>
+			<if test="q_feed_back!=null and q_feed_back!=''">
+				AND d.feed_back=#{q_feed_back}
+			</if>
+			<if test="q_prod_no!=null and q_prod_no!=''">
+				AND d.prod_id=#{q_prod_no}
+			</if>
+			<if test="q_activity!=null and q_activity!=''">
+				AND d.action_id=#{q_activity}
+			</if>
+			<if test="q_order_status!=null and q_order_status!=''">
+				AND d.order_status=#{q_order_status}
+			</if>
+			<if test="q_website!=null and q_website!=''">
+				AND d.website_id=#{q_website}
+			</if>
+			order by order_time
+	</select>
+	
+	
+</mapper>
+

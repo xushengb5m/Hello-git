@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration    
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+     
+<configuration>
+	<!-- MyBatis 设置 -->
+	<settings>
+		<!-- 启用下划线与驼峰式命名规则的映射 -->
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+	</settings>
+	
+	<plugins>  
+	    <plugin interceptor="com.b5m.cpsx.commons.mybatis.dialect.PagePlugin">  
+	        <property name="dialect" value="mysql"/>  
+	        <!-- 只要是sql的id（即mapper里的方法的命名）是以 ListPage结尾的都要通过该拦截器插件处理
+			pageSqlId在新加的拦截器里有获取到后加以判断 -->
+	        <property name="pageSqlId" value=".*ListPage"/>  
+		</plugin>
+	<!-- 
+		只要是sql的id（即mapper里的方法的命名）都要通过该拦截器插件处理
+		<plugin interceptor="com.b5m.cpsx.commons.aop.LogRecord">
+			<property name="dialect" value="mysql" />
+			<property name="pageSqlId" value=".*.*Mapper.*" />
+		</plugin>-->
+		
+		<plugin interceptor="com.b5m.cpsx.commons.aop.LogOperationInteceptor">  
+	        <property name="dialect" value="mysql"/>
+	        <property name="pageSqlId" value="(websiteMapper|cpsxUserMapper|settleMapper|earnerActivityMapper).(update|insert|delete).*"/>  
+	    </plugin> 
+	</plugins> 
+	
+</configuration>

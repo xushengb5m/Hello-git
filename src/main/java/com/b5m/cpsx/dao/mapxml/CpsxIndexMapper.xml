@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="cpsxIndexMapper">
+
+	<select id="selectNotice" resultType="java.util.HashMap">
+		SELECT cafn.*, cada.name AS activity_name
+		FROM cpsx_activity_fact_notification AS cafn
+		LEFT JOIN cpsx_activity_dim_activity AS cada
+		ON cafn.activity_id = cada.id
+		WHERE cafn.type = 1
+		ORDER BY cafn.create_time DESC
+		LIMIT 8
+	</select>
+	
+	<select id="selectReward" resultType="java.util.HashMap">
+		SELECT cafn.*, cada.name AS activity_name
+		FROM cpsx_activity_fact_notification AS cafn
+		LEFT JOIN cpsx_activity_dim_activity AS cada
+		ON cafn.activity_id = cada.id
+		WHERE cafn.type = 2
+		ORDER BY cafn.create_time DESC
+		LIMIT 8
+	</select>
+	
+	<select id="selectSale" resultType="java.util.HashMap">
+		SELECT cafn.*, cada.name AS activity_name
+		FROM cpsx_activity_fact_notification AS cafn
+		LEFT JOIN cpsx_activity_dim_activity AS cada
+		ON cafn.activity_id = cada.id
+		WHERE cafn.type = 3
+		ORDER BY cafn.create_time DESC
+		LIMIT 8
+	</select>
+	
+	<select id="selectAdvertiser" resultType="java.util.HashMap">
+		SELECT cafa.image, cada.name, cada.charge_mode, cafa.commission
+		FROM cpsx_activity_fact_activity AS cafa
+		LEFT JOIN cpsx_activity_dim_activity AS cada
+		ON cafa.activity_id = cada.id
+		ORDER BY cada.create_time desc
+		LIMIT 12
+	</select>	
+
+</mapper>

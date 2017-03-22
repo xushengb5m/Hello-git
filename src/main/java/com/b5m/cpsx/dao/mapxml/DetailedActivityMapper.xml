@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="detailedActivityMapper">
+
+	<insert id="insertOne" parameterType="java.util.HashMap">
+		INSERT INTO cpsx_activity_fact_activity (activity_id, image, commission, rd, approval_mode, clearing_cycle_id, data_return_mode, has_feedback, has_self_links,
+												prohibited_sites_types, restrictions, is_active, start_date, end_date, note, create_time)
+		VALUES (#{activity_id}, #{image}, #{commission}, #{rd}, #{approval_mode}, #{clearing_cycle_id}, #{data_return_mode}, #{has_feedback}, #{has_self_links},
+												#{prohibited_sites_types}, #{restrictions}, #{is_active}, #{start_date}, #{end_date}, #{note}, NOW())
+	</insert>
+	
+	<select id="select" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT cafa.*, cada.name AS activity_name, cadcc.clearing_cycle
+		FROM cpsx_activity_fact_activity AS cafa
+		LEFT JOIN cpsx_activity_dim_activity AS cada
+		ON cafa.activity_id = cada.id
+		LEFT JOIN cpsx_activity_dim_clearing_cycle AS cadcc
+		ON cafa.clearing_cycle_id = cadcc.id
+	</select>
+	
+	<select id="selectActivity" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT *
+		FROM cpsx_activity_dim_activity
+		WHERE is_active = 1
+	</select>
+	
+	<select id="selectClearingCycle" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT *
+		FROM cpsx_activity_dim_clearing_cycle
+	</select>
+	
+	<select id="selectOne" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT *
+		FROM cpsx_activity_fact_activity
+		WHERE id = #{id}
+	</select>
+	
+	<select id="updateOne" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+	UPDATE cpsx_activity_fact_activity
+	SET activity_id=#{activity_id}, image=#{image}, commission=#{commission}, rd=#{rd}, approval_mode=#{approval_mode}, clearing_cycle_id=#{clearing_cycle_id},
+		data_return_mode=#{data_return_mode}, has_feedback=#{has_feedback}, has_self_links=#{has_self_links}, prohibited_sites_types=#{prohibited_sites_types},
+		restrictions=#{restrictions}, is_active=#{is_active}, start_date=#{start_date}, end_date=#{end_date}, note=#{note}
+	WHERE id = #{id}
+	</select>
+
+</mapper>

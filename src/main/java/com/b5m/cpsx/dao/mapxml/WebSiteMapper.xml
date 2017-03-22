@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="websiteMapper">
+	<!-- Website -->
+	<select id="selectWebsiteByUserId" resultType="java.util.HashMap">
+		SELECT t.id,t.supply_id,t.name,t.url,t.app_type,w.name AS typeName,t.type,t.verification_mode,t.verification_status,
+		t.approval_status,t.ip_per_day,t.about,t.record_info,t.is_default,t.create_time,t.update_time 
+		FROM cpsx_supply_dim_website t LEFT JOIN cpsx_supply_dim_site_type w on t.type=w.id
+		WHERE supply_id=#{supply_id}
+	</select>
+	
+	<select id="selectOneWebsite" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT id,supply_id,name,url,app_type,type,verification_mode,verification_status,approval_status,
+		ip_per_day,about,record_info,is_default,create_time,update_time 
+		FROM cpsx_supply_dim_website
+		WHERE id=#{wid}
+	</select>
+	
+	<select id="selectAllWebsite" resultType="java.util.HashMap">
+		SELECT t.id,t.supply_id,t.name,t.url,t.app_type,w.name AS typeName,t.type,t.verification_mode,t.verification_status,
+		t.approval_status,t.ip_per_day,t.about,t.record_info,t.is_default,t.create_time,t.update_time 
+		FROM cpsx_supply_dim_website t LEFT JOIN cpsx_supply_dim_site_type w on t.app_type=w.id
+	</select>
+	
+	<insert id="insertWebsite" parameterType="java.util.HashMap">
+		INSERT INTO cpsx_supply_dim_website(supply_id,name,url,app_type,type,verification_mode,
+		ip_per_day,about,record_info,is_default,create_time) 
+		VALUES (
+			#{supply_id},
+			#{name},
+			#{url},
+			#{app_type},
+			#{type},
+			#{verification_mode},
+			#{ip_per_day},
+			#{about},
+			#{record_info},
+			#{is_default},
+			now()
+		)	
+	</insert>
+	
+	<update id="updateWebsite" parameterType="java.util.HashMap">
+		update cpsx_supply_dim_website 
+		SET supply_id=#{supply_id},
+			name=#{name},
+			url=#{url},
+			app_type=#{app_type},
+			type=#{type},
+			verification_mode=#{verification_mode},
+			ip_per_day=#{ip_per_day},
+			about=#{about},
+			record_info=#{record_info},
+			is_default=#{is_default},
+			create_time=now()
+		WHERE id=#{id}
+	</update>
+	
+	<update id="checkWebsite" parameterType="java.util.HashMap">
+		update cpsx_supply_dim_website 
+		SET 
+			verification_status=#{validate},
+			approval_status=#{check},
+			update_time=now()
+		WHERE id=#{rid}
+	</update>
+
+	<delete id="deleteWebsite" parameterType="java.util.HashMap">
+		delete FROM cpsx_supply_dim_website WHERE id=#{id}
+	</delete>
+
+
+	<!-- Website Category -->
+	<select id="selectWebsiteCategory" resultType="java.util.HashMap">
+		SELECT id,name,note 
+		FROM cpsx_supply_dim_site_type
+	</select>
+	
+	<insert id="insertWebsiteCategory" parameterType="java.util.HashMap">
+		INSERT INTO cpsx_supply_dim_site_type(name,note,create_time) 
+		VALUES (
+			#{name},
+			#{note},
+			now()
+		)	
+	</insert>
+	
+	<update id="updateWebsiteCategory" parameterType="java.util.HashMap">
+		update cpsx_supply_dim_site_type 
+		SET 
+			name=#{name},
+			note=#{note},
+			update_time=now()
+		WHERE id=#{id}
+	</update>
+
+	<delete id="deleteWebsiteCategory" parameterType="java.util.HashMap">
+		delete FROM cpsx_supply_dim_site_type WHERE id=#{rowId}
+	</delete>
+	
+</mapper>

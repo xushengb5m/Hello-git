@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="earnerActivityMapper">
+	
+	<select id="select" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT cada.*, cadc.name AS category_name, cafa.commission, cafa.rd,
+			   cafa.start_date, cafa.end_date, cafa.approval_mode, cafa.image, csdwaa.approval_status
+		FROM cpsx_activity_fact_activity AS cafa
+		LEFT JOIN cpsx_activity_dim_activity AS cada
+		ON cafa.activity_id = cada.id
+		LEFT JOIN cpsx_activity_dim_category AS cadc
+		ON cada.type = cadc.id
+		LEFT JOIN cpsx_supply_dim_website_activity_approval AS csdwaa
+		ON cafa.activity_id = csdwaa.activity_id AND csdwaa.website_id=#{id} <!-- AND csdwaa.supply_id=#{supply_id} -->
+	</select>
+	
+	<select id="selectWebsiteIsAdmin" parameterType="com.b5m.cpsx.model.User" resultType="java.util.HashMap">
+		SELECT csdw.*
+		FROM cpsx_supply_dim_website AS csdw
+		WHERE csdw.verification_status = 3 AND csdw.approval_status = 3
+	</select>
+	
+	<select id="selectWebsiteNotAdmin" parameterType="com.b5m.cpsx.model.User" resultType="java.util.HashMap">
+		SELECT csdw.*
+		FROM cpsx_supply_dim_website AS csdw
+		WHERE csdw.supply_id = #{id} AND csdw.verification_status = 3 AND csdw.approval_status = 3
+	</select>
+	
+	<select id="selectOne" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT cada.*, cadc.name AS category_name, cafa.*, cadcc.clearing_cycle
+		FROM cpsx_activity_dim_activity AS cada
+		LEFT JOIN cpsx_activity_dim_category AS cadc
+		ON cada.type = cadc.id
+		LEFT JOIN cpsx_activity_fact_activity AS cafa
+		ON cada.id = cafa.activity_id
+		LEFT JOIN cpsx_activity_dim_clearing_cycle AS cadcc
+		ON cafa.clearing_cycle_id = cadcc.id
+		WHERE cada.id = #{id}
+	</select>
+	
+	<select id="selectCommission" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT cafci.*
+		FROM cpsx_activity_fact_commission_info AS cafci
+		LEFT JOIN cpsx_activity_fact_activity AS cafa
+		ON cafci.activity_id = cafa.activity_id
+		WHERE cafa.id = #{id}
+	</select>
+
+	<select id="selectNotification" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT cafn.*
+		FROM cpsx_activity_fact_notification AS cafn
+		LEFT JOIN cpsx_activity_fact_activity AS cafa
+		ON cafn.activity_id = cafa.activity_id
+		WHERE cafa.id = #{id}
+	</select>
+	
+	<select id="selectWebsite" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT csdw.*
+		FROM cpsx_supply_dim_website AS csdw
+		WHERE csdw.id = #{website_id}
+	</select>
+	
+	<select id="selectSupply" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT *
+		FROM cpsx_supply_dim_website
+		WHERE id = #{website_id}
+	</select>
+	
+	<select id="selectActivity" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT cafa.*
+		FROM cpsx_activity_fact_activity AS cafa
+		WHERE cafa.activity_id = #{activity_id}
+	</select>
+		
+	<insert id="insertOne" parameterType="java.util.HashMap">
+		INSERT INTO cpsx_supply_dim_website_activity_approval(supply_id, website_id, activity_id, approval_status)
+		VALUES(#{supply_id}, #{website_id}, #{activity_id}, #{approval_status}) 		
+	</insert>
+	
+	<select id="selectApproval" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT csdwaa.*
+		FROM cpsx_supply_dim_website_activity_approval AS csdwaa
+		WHERE csdwaa.website_id = #{website_id} AND csdwaa.activity_id = #{activity_id}
+	</select>
+
+</mapper>

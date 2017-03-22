@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="roleResourceMapper">
+	
+	<delete id="delRoleResource" parameterType="long">
+		delete from cpsx_sys_map_role_resource where role_id = #{id}
+	</delete>
+	
+	<insert id="bindResourceRoleBatch" parameterType="java.util.List" keyColumn="id">  
+        INSERT INTO cpsx_sys_map_role_resource (role_id,resource_id)   
+        VALUES  
+        <foreach collection="list" item="item" index="index" separator="," >  
+            (#{item.roleId},#{item.resourceIdArray})  
+        </foreach>
+    </insert>
+</mapper>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cpsxResourceMapper">
+	
+	<select id="selectResourceList" resultType="com.b5m.cpsx.model.Resource">
+				SELECT distinct r.id,r.url as resourceUrl,r.name as resourceName,r.eng_name AS engName,r.is_menu AS ismenu,r.posorder,
+					   r.parent_id as topid,r.cls_name as clsname,r.create_time 
+				FROM cpsx_sys_dim_resource r 
+				LEFT JOIN cpsx_sys_map_role_resource role 
+				on r.id=role.resource_id where 1=1 
+				and role.role_id in(
+				 	  <foreach collection="list" item="roleIdList" index="index" separator=",">
+            			#{roleIdList}
+        			  </foreach>) 
+				 order by r.posorder asc
+	</select>
+	
+	<select id="selectAllResourceList"  resultType="com.b5m.cpsx.model.Resource">
+				select id,url as resourceUrl,name as resourceName,is_menu,eng_name as engName,posorder,parent_id as topid,cls_name as clsname 
+				from cpsx_sys_dim_resource
+				
+	</select>
+	
+	<select id="selectResourceUrls" resultType="com.b5m.cpsx.model.RBACRoleAccess">
+		select map.role_id roleId,resource.url as accessurl 
+		from cpsx_sys_dim_resource resource 
+		join cpsx_sys_map_role_resource map 
+		on resource.id=map.resource_id where map.role_id in(
+		<foreach collection="list" item="roleId" index="index" separator=",">
+            #{roleId}
+        </foreach>)
+	</select>
+	
+	<select id="existByResourceId" parameterType="long" resultType="long">
+				select count(id) from cpsx_sys_map_role_resource where resource_id=#{resource_id}
+	</select>
+	
+	<select id="isHasChildrenById" parameterType="long"  resultType="long">
+				select count(id) from cpsx_sys_dim_resource where parent_id = #{topid}
+	</select>
+	
+	<update id="updateResource" parameterType="com.b5m.cpsx.model.Resource" >
+				update cpsx_sys_dim_resource set name=#{resourceName}, url=#{resourceUrl},eng_name=#{engName},
+				is_menu=#{ismenu}, cls_name=#{clsname}, posorder=#{posorder}, parent_id=#{topid} where id=#{id}
+	
+	</update>
+	
+	<insert id="insertOneResource" parameterType="com.b5m.cpsx.model.Resource" useGeneratedKeys="true" keyColumn="id">
+				insert into cpsx_sys_dim_resource (name,url,is_menu,cls_name,eng_name,posorder,parent_id) 
+				VALUES(#{resourceName},#{resourceUrl},#{ismenu},#{clsname},#{engName},#{posorder},#{topid})
+	</insert>
+	
+	<delete id="deleteOneResource" parameterType="integer">
+			delete from cpsx_sys_dim_resource where id = #{id}
+	</delete>
+	
+	
+</mapper>

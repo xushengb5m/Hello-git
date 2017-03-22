@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="notificationMapper">
+
+	<insert id="insertOne" parameterType="java.util.HashMap">
+		INSERT INTO cpsx_activity_fact_notification (activity_id, title, type, info, create_time)
+		VALUES (#{activity_id}, #{title}, #{type}, #{info}, NOW())
+	</insert>
+	
+	<select id="select" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT cafn.*, cada.name AS activity_name
+		FROM cpsx_activity_fact_notification AS cafn
+		LEFT JOIN cpsx_activity_dim_activity AS cada
+		ON cafn.activity_id = cada.id
+	</select>
+	
+	<select id="selectActivity" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT *
+		FROM cpsx_activity_dim_activity
+		WHERE is_active = 1
+	</select>
+	
+	<select id="selectOne" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT *
+		FROM cpsx_activity_fact_notification
+		WHERE id = #{id}
+	</select>
+	
+	<select id="updateOne" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		UPDATE cpsx_activity_fact_notification
+		SET activity_id=#{activity_id}, title=#{title}, type=#{type}, info=#{info}
+		WHERE id = #{id}
+	</select>
+
+</mapper>

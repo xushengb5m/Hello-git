@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="earnerActivityApprovalMapper">
+	
+	<select id="select" resultType="java.util.HashMap">
+		SELECT csdwaa.*, csdw.name AS website_name, cafa.image AS activity_image, cafa.commission AS activity_commission,
+			   cafa.rd AS activity_rd, cafa.start_date AS activity_start_date, cafa.end_date AS activity_end_date,
+			   cada.name AS activity_name, cada.charge_mode AS activity_charge_mode, cadc.name AS activity_category_name
+		FROM cpsx_supply_dim_website_activity_approval AS csdwaa
+		LEFT JOIN cpsx_supply_dim_website AS csdw
+		ON csdwaa.website_id = csdw.id
+		LEFT JOIN cpsx_activity_fact_activity AS cafa
+		ON csdwaa.activity_id = cafa.activity_id
+		LEFT JOIN cpsx_activity_dim_activity AS cada
+		ON cafa.activity_id = cada.id
+		LEFT JOIN cpsx_activity_dim_category AS cadc
+		ON cada.category = cadc.id
+		WHERE cafa.approval_mode = 2
+	</select>
+	
+	<update id="update" parameterType="java.util.HashMap">
+		UPDATE cpsx_supply_dim_website_activity_approval
+		SET approval_status = #{approval_status},
+		commission_rate = #{rate}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

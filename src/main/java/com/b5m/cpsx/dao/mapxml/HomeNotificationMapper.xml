@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="homeNotificationMapper">
+
+	<select id="selectOne" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT cafn.*, cada.merchant_id, cada.charge_mode, cada.name AS activity_name, cada.domain, cafa.commission, cafa.start_date, cafa.end_date 
+		FROM cpsx_activity_fact_notification AS cafn
+		LEFT JOIN cpsx_activity_dim_activity AS cada
+		ON cafn.activity_id = cada.id
+		LEFT JOIN cpsx_activity_fact_activity AS cafa
+		ON cafn.activity_id = cafa.activity_id
+		WHERE cafn.id = #{id}
+	</select>
+
+</mapper>

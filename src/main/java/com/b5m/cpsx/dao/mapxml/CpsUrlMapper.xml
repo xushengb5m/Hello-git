@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cpsUrlMapper">
+	<!-- CPS Exchange Pattern -->
+	<select id="selectExchangePattern" resultType="java.util.HashMap">
+		SELECT id,union_name,union_type,handle_type,click_type,url_pattern_note,url_pattern_addr,url_param_fb,url_param_to,url_param_ac,
+		is_url_to_encode,url_account_pattern,is_enable,create_time,create_by,update_time 
+		FROM cpsx_url_exchange_pattern
+	</select>
+	
+	<select id="selectOnePatternJson" parameterType="java.util.HashMap" resultType="java.lang.String">
+		SELECT url_account_pattern
+		FROM cpsx_url_exchange_pattern
+		WHERE id=#{id}
+	</select>
+	
+	<select id="selectOnePatternById" resultType="java.util.HashMap">
+		SELECT *
+		FROM cpsx_url_exchange_pattern
+		WHERE id=#{pid}
+	</select>
+	
+	<select id="selectPatLastId" resultType="Integer">
+		SELECT max(id)
+		FROM cpsx_url_exchange_pattern
+	</select>
+	
+	<select id="selectOneExchangePattern" parameterType="java.util.HashMap" resultType="integer">
+		SELECT COUNT(*) FROM cpsx_url_exchange_pattern
+		WHERE union_name=#{union_name}
+	</select>
+	
+	<insert id="insertExchangePattern" parameterType="java.util.HashMap">
+		INSERT INTO cpsx_url_exchange_pattern (id,union_name,union_type,handle_type,click_type,url_pattern_note,
+		url_pattern_addr,url_param_fb,url_param_to,url_param_ac,
+		is_url_to_encode,url_account_pattern,is_enable,create_time,create_by) 
+		VALUES (
+			#{id},
+			#{union_name},
+			#{union_type},
+			#{handle_type},
+			#{click_type},
+			#{url_pattern_note},
+			#{url_pattern_addr},
+			#{url_param_fb},
+			#{url_param_to},
+			#{url_param_ac},
+			#{is_url_to_encode},
+			#{url_account_pattern},
+			#{is_enable},
+			now(),
+			#{sysuser}
+		)	
+	</insert>
+	
+	<update id="updateExchangePattern" parameterType="java.util.HashMap">
+		update cpsx_url_exchange_pattern 
+		SET union_name=#{union_name},
+			union_type=#{union_type},
+			handle_type=#{handle_type},
+			click_type=#{click_type},
+			url_pattern_note=#{url_pattern_note},
+			url_pattern_addr=#{url_pattern_addr},
+			url_param_fb=#{url_param_fb},
+			url_param_to=#{url_param_to},
+			url_param_ac=#{url_param_ac},
+			is_url_to_encode=#{is_url_to_encode},
+			url_account_pattern=#{url_account_pattern},
+			is_enable=#{is_enable},
+			update_time=now()
+		WHERE id=#{id}
+	</update>
+
+	<delete id="deleteExchangePattern" parameterType="java.util.HashMap">
+		delete FROM cpsx_url_exchange_pattern WHERE id=#{id}
+	</delete>
+
+
+	<!-- CPS URL Account -->
+	<select id="selectCpsAccount" resultType="java.util.HashMap">
+		SELECT id,pattern_id,account_info,union_account,user_id,host,is_enable
+		FROM cpsx_url_exchange_account
+	</select>
+	
+	
+	<select id="selectActLastId" resultType="Integer">
+		SELECT max(id)
+		FROM cpsx_url_exchange_account
+	</select>
+	
+	<select id="selectCpsAccountById" resultType="java.util.HashMap">
+		SELECT id,pattern_id,account_info,union_account,user_id,host,is_enable,create_time,create_by,update_time 
+		FROM cpsx_url_exchange_account
+		WHERE pattern_id=#{id}
+	</select>
+	
+	<select id="selectAllAccount" resultType="java.util.HashMap">
+		SELECT id,union_account,user_id,host
+		FROM cpsx_url_exchange_account
+	</select>
+	
+	<select id="selectOneUrlAccount" parameterType="java.util.HashMap" resultType="integer">
+		SELECT COUNT(*) FROM cpsx_url_exchange_account
+		WHERE union_account=#{union_account}
+	</select>
+	
+	<insert id="insertCpsAccount" parameterType="java.util.HashMap">
+		INSERT INTO cpsx_url_exchange_account (id,pattern_id,account_info,union_account,user_id,host,is_enable,create_time,create_by) 
+		VALUES (
+		#{id},
+		#{pattern_id},
+		#{account_info},
+		#{union_account},
+		#{user_id},
+		#{host},
+		#{is_enable},
+		now(),
+		#{sysuser}
+		)	
+	</insert>
+	
+	<update id="updateCpsAccount" parameterType="java.util.HashMap">
+		update cpsx_url_exchange_account 
+		SET pattern_id=#{pattern_id},account_info=#{account_info},union_account=#{union_account},
+		user_id=#{user_id},host=#{host},is_enable=#{is_enable},update_time=now()
+		WHERE id=#{id}
+	</update>
+
+	<delete id="deleteCpsAccount" parameterType="java.util.HashMap">
+		delete FROM cpsx_url_exchange_account WHERE id=#{id}
+	</delete>
+	
+	<!-- CPS ActivityRule Method -->
+	<select id="selectActivityRule" resultType="java.util.HashMap">
+		SELECT id,activity_id,account_id,note,start_id,end_id,is_enable,create_time,create_by,update_time 
+		FROM cpsx_url_exchange_activity_rule
+	</select>
+	
+	<select id="selectRuleLastId" resultType="Integer">
+		SELECT max(id)
+		FROM cpsx_url_exchange_activity_rule
+	</select>
+	
+	
+	<select id="selectOneRuleById" resultType="java.util.HashMap">
+		SELECT *
+		FROM cpsx_url_exchange_activity_rule
+		WHERE id=#{pid}
+	</select>
+	
+	<select id="selectOneActivityRule" parameterType="java.util.HashMap" resultType="integer">
+		SELECT COUNT(*) FROM cpsx_url_exchange_activity_rule
+		WHERE activity_id=#{activity_id}
+	</select>
+	
+	<insert id="insertActivityRule" parameterType="java.util.HashMap">
+		INSERT INTO cpsx_url_exchange_activity_rule 
+		(id,activity_id,account_id,note,start_id,end_id,is_enable,create_time,create_by)
+		VALUES (
+		#{id},
+		#{activity_id},
+		#{account_id},
+		#{note},
+		#{start_id},
+		#{end_id},
+		#{is_enable},
+		now(),
+		#{sysuser}
+		)	
+	</insert>
+	
+	<update id="updateActivityRule" parameterType="java.util.HashMap">
+		update cpsx_url_exchange_activity_rule 
+		SET activity_id=#{activity_id},account_id=#{account_id},note=#{note},
+		start_id=#{start_id},end_id=#{end_id},is_enable=#{is_enable},update_time=now()
+		WHERE id=#{id}
+	</update>
+
+	<delete id="deleteActivityrule" parameterType="java.util.HashMap">
+		delete FROM cpsx_url_exchange_activity_rule WHERE id=#{rowId}
+	</delete>
+</mapper>

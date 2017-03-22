@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cpsxRoleMapper">
+
+	<insert id="insertOneRole" parameterType="com.b5m.cpsx.model.CpsxRole" useGeneratedKeys="true" keyColumn="id">
+				insert into cpsx_sys_dim_role(role,remark) VALUES(#{role},#{remark})
+	</insert>
+	
+	<update id="updateRole" parameterType="com.b5m.cpsx.model.CpsxRole" >
+		update cpsx_sys_dim_role set role=#{role} , remark=#{remark} where id=#{id}
+	</update>
+	
+	<select id="selectLastInsertId" resultType="long">
+		select last_insert_id()
+	</select>
+	
+	<select id="selectAllRoles" resultType="com.b5m.cpsx.model.CpsxRole">
+		select id,role,remark from cpsx_sys_dim_role
+	</select>
+	
+	<select id="selectRoleAccessList" resultType="com.b5m.cpsx.model.RBACRoleAccess">
+		select id as roleId,role as roleName from cpsx_sys_dim_role
+	</select>
+	
+	<select id="selectRoleById" resultType="com.b5m.cpsx.model.CpsxRole">
+		select id,role,remark from cpsx_sys_dim_role where id=#{id};
+	</select>
+	
+	<select id="selectResourcesByRole" parameterType="integer" resultType="com.b5m.cpsx.model.Resource">
+		select res.id as id,res.url as resourceUrl,res.name as resourceName,res.is_menu,res.eng_name as engName,posorder,res.parent_id as topid,
+		res.cls_name as clsname from cpsx_sys_dim_resource res 
+		inner join cpsx_sys_map_role_resource ro_res 
+		on ro_res.resource_id=res.id where ro_res.role_id=#{id}
+	</select>
+	
+</mapper>

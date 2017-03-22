@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="confirmOrderMapper">
+
+	<select id="selectConfirmOrder" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT
+			d.order_no,
+			d.activity_id,
+			d.website_id,
+			d.order_time,
+			d.settle_time,
+			d.settle_commission
+		FROM cpsx_settle_fact_confirm_order d
+		LEFT JOIN cpsx_supply_dim_website w ON d.website_id = w.id
+		WHERE w.supply_id = #{user_id}
+		AND DATE_FORMAT(settle_time,'%Y-%m')=#{settle_date}
+	</select>
+	
+	<select id="selectAllConfirmOrders" resultType="java.util.HashMap">
+		SELECT * FROM cpsx_settle_fact_confirm_order
+	</select>
+	
+	<select id="selectOneData" parameterType="String" resultType="java.util.HashMap">
+		SELECT settle_commission
+		FROM cpsx_settle_fact_confirm_order
+		WHERE unique_id = #{unique_id}
+	</select>
+
+	<insert id="insertConfirmOrder" parameterType="java.util.HashMap">
+		INSERT INTO cpsx_settle_fact_confirm_order
+		(
+			unique_id,
+			order_no,
+			activity_id,
+			website_id,
+			order_time,
+			order_price,
+			order_status,
+			prod_id,
+			prod_name, 
+			prod_type, 
+			prod_count, 
+			prod_price, 
+			commission,
+			commission_rate,
+			feed_back,
+			settle_money,
+			settle_time,
+			settle_commission,
+			currency,
+			note
+		)VALUE(
+		    #{unique_id},
+			#{order_no},
+			#{activity_id},
+			#{website_id},
+			#{order_time},
+			#{order_price},
+			#{order_status},
+			#{prod_id},
+			#{prod_name},
+			#{prod_type},
+			#{prod_count},
+			#{prod_price},
+			#{commission},
+			#{commission_rate},
+			#{feed_back},
+			#{settle_money},
+			#{settle_time},
+			#{settle_commission},
+			#{currency},
+			#{note}
+		)
+	</insert>
+	
+	<update id="updateConfirmOrder" parameterType="java.util.HashMap">
+		UPDATE cpsx_settle_fact_confirm_order
+		SET
+			settle_money=#{settle_money},
+			settle_time=#{settle_time},
+			settle_commission=#{settle_commission},
+			currency=#{currency}
+		WHERE unique_id=#{unique_id}
+	</update>
+</mapper>

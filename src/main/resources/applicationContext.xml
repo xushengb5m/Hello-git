@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:task="http://www.springframework.org/schema/task"  
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+     http://www.springframework.org/schema/beans/spring-beans-3.2.xsd  
+     http://www.springframework.org/schema/context  
+   http://www.springframework.org/schema/context/spring-context-3.2.xsd  
+     http://www.springframework.org/schema/mvc  
+     http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+	http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.2.xsd  ">
+	
+	<bean class="com.b5m.cpsx.utils.SpringContextUtils" lazy-init="false"
+		destroy-method="destroy"></bean>
+	
+	<context:annotation-config/>	
+	<context:component-scan base-package="com.b5m">
+		<context:include-filter type="regex"
+			expression="com.b5m.*.dao" />
+		<context:include-filter type="regex"
+			expression="com.b5m.*.service" />
+		<context:include-filter type="regex"
+			expression="com.b5m.*.ctrl" />
+	</context:component-scan>
+	
+	<context:component-scan base-package="com.b5m.cpsx.service" />
+	<context:component-scan base-package="com.b5m.cpsx.dao" />
+	<context:component-scan base-package="com.b5m.cpsx.ctrl" />
+	<context:component-scan base-package="com.b5m.cpsx.commons.aop" />
+	
+	<!--自动注入 -->
+	<aop:aspectj-autoproxy />
+	
+	<bean
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
+		<property name="targetMethod" value="initLogging" />
+		<property name="arguments">
+			<list>
+				<value>classpath:log4j.properties</value>
+			</list>
+		</property>
+	</bean>
+		
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<!-- 基本属性 url、user、password -->
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="driverClassName" value="${jdbc.driverClassName}"></property>
+
+		<!-- 配置初始化大小、最小、最大 -->
+		<property name="initialSize" value="50" />
+		<property name="minIdle" value="50" />
+		<property name="maxActive" value="200" />
+
+		<!-- 配置获取连接等待超时的时间 -->
+		<property name="maxWait" value="60000" />
+
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 60000 -->
+		<property name="timeBetweenEvictionRunsMillis" value="6000" />
+
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+
+		<property name="validationQuery" value="SELECT 'x'" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+
+		<!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+		<property name="poolPreparedStatements" value="false" />
+		<property name="maxPoolPreparedStatementPerConnectionSize"
+			value="20" />
+	</bean>
+	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:mybatis-config.xml"></property>
+		<property name="mapperLocations">
+			<array>
+				<value>classpath*:com/b5m/cpsx/dao/mapxml/*Mapper.xml</value>
+			</array>
+		</property>
+	</bean>
+
+	
+	<!-- ================================= 事务控制相关 start ============================================= -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<aop:config>
+		<aop:pointcut id="bussinessService"
+			expression="execution(public * com.b5m.cpsx..*Service*.*(..))" />
+		<aop:advisor pointcut-ref="bussinessService" advice-ref="txAdvice" />
+	</aop:config>
+
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="delete*" propagation="REQUIRED" read-only="false"
+				rollback-for="java.lang.Exception" no-rollback-for="java.lang.RuntimeException" />
+			<tx:method name="insert*" propagation="REQUIRED" read-only="false"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="save*" propagation="REQUIRED" read-only="false"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="update*" propagation="REQUIRED" read-only="false"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="refresh*" propagation="REQUIRED"
+				read-only="false" rollback-for="java.lang.Exception" />
+
+			<tx:method name="find*" propagation="SUPPORTS" />
+			<tx:method name="get*" propagation="SUPPORTS" />
+			<tx:method name="select*" propagation="SUPPORTS" />
+			<tx:method name="load*" propagation="SUPPORTS" />
+			
+		</tx:attributes>
+	</tx:advice>
+	<!-- ================================= 事务控制相关 End============================================= -->
+
+	<!-- spring 工具类 -->
+	<bean class="com.b5m.cpsx.utils.ContextUtils" lazy-init="false"
+		destroy-method="destroy"></bean>
+	<bean id="springBeanUtil" class="com.b5m.cpsx.utils.SpringBeanUtil" />
+	
+	<!-- 通用查询mapper -->
+	<bean id="baseCommonMapper" class="com.b5m.cpsx.dao.BaseCommonMapper"
+		lazy-init="false">
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+	</bean>
+	
+	<!-- 通用查询service -->
+	<bean id="baseCommonService" class="com.b5m.cpsx.service.BaseCommonServiceImpl"
+		lazy-init="false">
+		<property name="baseCommonMapper" ref="baseCommonMapper"></property>
+	</bean>
+
+	<!-- 发送邮件 -->
+	<bean name="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.b5m.com" />
+		<property name="port" value="25"/>
+		<property name="defaultEncoding" value="UTF-8"></property>
+		<property name="username" value="bimail@b5m.com"></property>
+		<property name="password" value="Izene123"></property>
+		<property name="javaMailProperties">
+    		<props>
+      		  <prop key="mail.smtps.auth">true</prop>
+    		</props>
+    	</property>
+	</bean>
+	
+</beans>
