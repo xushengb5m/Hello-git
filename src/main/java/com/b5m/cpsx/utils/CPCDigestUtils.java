@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author janwen Apr 2, 2013 3:18:46 PM
  * 
  */
-public class DigestUtils {
+public class CPCDigestUtils {
 
 	/**
 	 * 
