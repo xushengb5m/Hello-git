@@ -2,13 +2,14 @@ package com.b5m.cpsx.service.cache;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 
 @Service("cacheMapService")
 public class CacheMapServiceImpl implements CacheMapService{
 
-	private static HashMap<String, Object> cacheMap = new HashMap<String, Object>();
+	private static Map<String, Object> cacheMap = new ConcurrentHashMap<String, Object>(1000);
 	
 	@Override
 	public Object getCache(String key) {  

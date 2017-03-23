@@ -23,7 +23,7 @@ import com.b5m.cpsx.ctrl.BaseController;
 import com.b5m.cpsx.model.ControllerMessage;
 import com.b5m.cpsx.model.User;
 import com.b5m.cpsx.service.settle.ISettleCommissionService;
-import com.b5m.cpsx.utils.DigestUtils;
+import com.b5m.cpsx.utils.CPCDigestUtils;
 import com.b5m.cpsx.utils.GetUserFromCookieUtils;
 import com.b5m.cpsx.utils.MailUtils;
 @Controller
@@ -65,7 +65,7 @@ public class SettleApplyController extends BaseController{
 	@RequestMapping(value = "/payAccount/{user_id}", method=RequestMethod.GET)
 	public ModelAndView bankAccount(@PathVariable String user_id,HttpServletRequest request, HttpServletResponse response,
 			ModelAndView mv) {
-		User usr = GetUserFromCookieUtils.getUser(request, baseRedisService);
+		User usr = GetUserFromCookieUtils.getUser(request);
 		if(user_id.equals(usr.getId()+"")){
 			Object payAccount = baseCommonService.selectOne("payAccountMapper.selectPayAccount", user_id);
 			mv.addObject("payAccount", payAccount);
@@ -135,8 +135,8 @@ public class SettleApplyController extends BaseController{
 	public Object EditPayPassword(@PathVariable String id,HttpServletRequest request, HttpServletResponse response) {
 		Map<String,String> params = paramMap(request);
 		ControllerMessage cm = new ControllerMessage();
-		String psw = DigestUtils.getMD5Hex(DigestUtils.getMD5Hex(params.get("login_psw"))
-				+ DigestUtils.getMD5Hex(params.get("email")));
+		String psw = CPCDigestUtils.getMD5Hex(CPCDigestUtils.getMD5Hex(params.get("login_psw"))
+				+ CPCDigestUtils.getMD5Hex(params.get("email")));
 		params.put("psw", psw);
 		int isExist = (int) baseCommonService.selectOne("cpsxUserMapper.selectCountUser", params);
 		params.put("user_id", id);

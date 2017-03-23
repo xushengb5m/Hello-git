@@ -35,7 +35,7 @@ import com.b5m.cpsx.ctrl.BaseController;
 import com.b5m.cpsx.model.User;
 import com.b5m.cpsx.service.cache.CacheMapService;
 import com.b5m.cpsx.service.login.InitService;
-import com.b5m.cpsx.utils.DigestUtils;
+import com.b5m.cpsx.utils.CPCDigestUtils;
 import com.b5m.cpsx.utils.GetUserFromCookieUtils;
 import com.b5m.cpsx.utils.WebCookieComponent;
 
@@ -102,8 +102,7 @@ public class LoginController extends BaseController implements ServletContextAwa
 	
 	@ResponseBody
 	@RequestMapping(value="/checkValidation", produces={"application/json;charset=UTF-8"})
-	private String checkValidation(HttpServletRequest request,
-			HttpServletResponse response, Model model, User user) {
+	private String checkValidation(HttpServletRequest request,HttpServletResponse response, Model model, User user) {
 		JSONObject jObject = new JSONObject();
 		try {
 			Cookie cookie = WebCookieComponent.getCookie(
@@ -163,7 +162,7 @@ public class LoginController extends BaseController implements ServletContextAwa
 							if (loginUser != null) {
 								loginUser.rolesHandling();
 								Cookie userCookie = WebCookieComponent.createCookie(CookieKeyConstant.CPSX_LOGIN_USER,
-										DigestUtils.getMD5Hex(UUID.randomUUID().toString()),-1);
+										CPCDigestUtils.getMD5Hex(UUID.randomUUID().toString()),-1);
 								response.addCookie(userCookie);
 
 								// 向缓存放入用户对象
@@ -179,8 +178,7 @@ public class LoginController extends BaseController implements ServletContextAwa
 								initService.loadMenu(loginUser.getRoleIds());
 								forward = "redirect:/cpsx/index.do";
 							} else {
-								model.addAttribute("failMsg",
-										"用户名密码错误");
+								model.addAttribute("failMsg","用户名密码错误");
 								model.addAttribute("reLogin", "reLogin");
 							}
 					}else{
@@ -206,8 +204,7 @@ public class LoginController extends BaseController implements ServletContextAwa
 	@RequestMapping("/mrgLogout")
 	public String mrgLogout(HttpServletRequest request,
 			HttpServletResponse response) {
-		User u = (User) request
-				.getAttribute(HttpAttributeKey.CPSX_USER_INFO);
+		User u = (User) request.getAttribute(HttpAttributeKey.CPSX_USER_INFO);
 		if (u != null) {
 			sc.removeAttribute(CacheConstant.CPSX_MENU_TOP + u.getRoleId());
 			sc.removeAttribute(CacheConstant.CPSX_MENU + u.getRoleId());

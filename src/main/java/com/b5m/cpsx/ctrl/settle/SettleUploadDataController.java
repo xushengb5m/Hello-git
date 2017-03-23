@@ -6,7 +6,6 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.b5m.cpsx.ctrl.BaseController;
 import com.b5m.cpsx.model.ControllerMessage;
-import com.b5m.cpsx.utils.DigestUtils;
+import com.b5m.cpsx.utils.CPCDigestUtils;
 
 
 @Controller
@@ -171,7 +170,7 @@ public class SettleUploadDataController extends BaseController{
 				param.put("note", getValue(row.getCell(errorColumn++)));
 				float commission = Float.parseFloat(param.get("commission"));
 				String str = param.get("order_no")+param.get("website_id")+param.get("activity_id")+(commission>0?"1":"0");
-				String uniqueId = DigestUtils.getMD5Hex(str);
+				String uniqueId = CPCDigestUtils.getMD5Hex(str);
 				param.put("unique_id", uniqueId);
 				Object settleCommission = baseCommonService.selectOne("confirmOrderMapper.selectOneData", uniqueId);
 				if (settleCommission!=null) {

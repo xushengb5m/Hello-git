@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.b5m.cpsx.model.ControllerMessage;
 import com.b5m.cpsx.model.Page;
 import com.b5m.cpsx.service.IBaseCommonService;
-import com.b5m.cpsx.service.IBaseRedisService;
 import com.b5m.cpsx.utils.DateUtils;
 import com.b5m.cpsx.utils.QuerySqlUtil;
 import com.google.gson.Gson;
@@ -32,9 +31,6 @@ public class BaseController {
 
 	@Autowired
 	protected IBaseCommonService baseCommonService;
-
-	@Autowired
-	protected IBaseRedisService baseRedisService;
 
 	/**
 	 * 通用查询一条记录

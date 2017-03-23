@@ -99,8 +99,8 @@ public class LoginInterceptor extends HandlerInterceptorAdapter implements Servl
 
 							request.setAttribute("tapMap", tapMap);
 						}
-						boolean ra = baseRedisService.expire(CacheConstant.USER_PREFIX + c.getValue(), 30*60);
-						boolean rb = baseRedisService.expire(CacheConstant.USER_PREFIX + cUser.getId(),30*60);
+//						boolean ra = baseRedisService.expire(CacheConstant.USER_PREFIX + c.getValue(), 30*60);
+//						boolean rb = baseRedisService.expire(CacheConstant.USER_PREFIX + cUser.getId(),30*60);
 						if (sc.getAttribute(CacheConstant.CPSX_MENU) == null
 								|| sc.getAttribute(CacheConstant.CPSX_MENU_TOP) == null) {
 							initDmpService.loadMenu(cUser.getRoleIds());
