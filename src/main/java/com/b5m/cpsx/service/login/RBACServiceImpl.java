@@ -16,6 +16,7 @@ import com.b5m.cpsx.commons.constant.CacheConstant;
 import com.b5m.cpsx.model.RBACRoleAccess;
 import com.b5m.cpsx.model.User;
 import com.b5m.cpsx.service.IBaseCommonService;
+import com.b5m.cpsx.service.cache.CacheMapService;
 import com.b5m.cpsx.service.login.IRBACService;
 import com.b5m.cpsx.utils.GetUserFromCookieUtils;
 
@@ -25,6 +26,9 @@ public class RBACServiceImpl implements IRBACService{
 	
 	@Autowired
 	private IBaseCommonService baseCommonService; //通用数据服务
+	
+	@Autowired
+	private CacheMapService cacheMapService;
 	
 	public void refreshRoleAccess() {
 		
@@ -100,8 +104,16 @@ public class RBACServiceImpl implements IRBACService{
 	@SuppressWarnings("unchecked")
 	public List<String> getRoleAccess(RBACRoleAccess roleAccess) {
 		List<String> urls = null;
+		if (roleAccess != null && roleAccess.isvalidRole()) {
+			urls = (List<String>)cacheMapService.getCache(CacheConstant.RBAC_ROLE
+					+ roleAccess.getRoleId().toString());
+		}
 
-
+		if (roleAccess == null || urls == null || urls.size() == 0) {
+			refreshRoleAccess();
+			urls = (List<String>)cacheMapService.getCache(CacheConstant.RBAC_ROLE
+					+ roleAccess.getRoleId().toString());
+		}
 		return urls;
 	}
 
