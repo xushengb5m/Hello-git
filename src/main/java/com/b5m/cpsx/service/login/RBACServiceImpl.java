@@ -55,9 +55,13 @@ public class RBACServiceImpl implements IRBACService{
 					cache_map.put(result.getRoleId(), cache_urls);
 				}
 			}
+			
+			for (Map.Entry<Long, List<String>> entry : cache_map.entrySet()) {
+				cacheMapService.putCache(CacheConstant.RBAC_ROLE
+						+ entry.getKey().toString(), entry.getValue());
+			}
 
 		}
-	
 		
 	}
 
