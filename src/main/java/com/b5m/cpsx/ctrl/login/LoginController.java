@@ -116,8 +116,6 @@ public class LoginController extends BaseController implements ServletContextAwa
 						jObject.put("msg0", "Empty Submit!");
 						jObject.put("msg1", "禁止空的提交！");
 					} else {
-						if (user.getAuthCode().toUpperCase()
-								.equals(checkCode.toUpperCase())) {
 							// check user in database!
 							User s_user = (User) baseCommonService.selectOne(
 									"cpsxUserMapper.selectOneUser", user);
@@ -128,10 +126,6 @@ public class LoginController extends BaseController implements ServletContextAwa
 								jObject.put("msg0", "Wrong Email OR Wrong Password!");
 								jObject.put("msg1", "用户名或密码错误！");
 							}
-						} else {
-							jObject.put("msg0", "Wrong Verfication Code!");
-							jObject.put("msg1", "验证码错误！");
-						}
 					}
 				}
 			}
@@ -155,8 +149,6 @@ public class LoginController extends BaseController implements ServletContextAwa
 							|| user.getEmail() == null) {
 						model.addAttribute("failFlag", "输入信息有误！");
 					} else {
-						if (user.getAuthCode().toUpperCase()
-								.equals(checkCode.toUpperCase())) {
 							// check user in database!
 							User loginUser = (User) baseCommonService.selectOne("cpsxUserMapper.selectOneUser",user);
 							if (loginUser != null) {
@@ -181,10 +173,6 @@ public class LoginController extends BaseController implements ServletContextAwa
 								model.addAttribute("failMsg","用户名密码错误");
 								model.addAttribute("reLogin", "reLogin");
 							}
-					}else{
-						model.addAttribute("failMsg", "验证码错误！");
-						model.addAttribute("reLogin", "reLogin");
-						}
 					}
 				}else{
 					model.addAttribute("failMsg", "重新登录");

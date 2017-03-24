@@ -32,6 +32,8 @@
 	<context:component-scan base-package="com.b5m.cpsx.ctrl" />
 	<context:component-scan base-package="com.b5m.cpsx.commons.aop" />
 	
+	<context:property-placeholder location="classpath:jdbc.properties" />
+	
 	<!--自动注入 -->
 	<aop:aspectj-autoproxy />
 	
